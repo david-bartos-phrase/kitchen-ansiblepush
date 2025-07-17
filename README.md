@@ -1,4 +1,5 @@
 # kitchen-ansiblepush
+
 [![Gem Version](https://badge.fury.io/rb/kitchen-ansiblepush.svg)](https://badge.fury.io/rb/kitchen-ansiblepush)
 [![Gem Downloads](http://ruby-gem-downloads-badge.herokuapp.com/kitchen-ansiblepush?type=total&color=brightgreen)](https://rubygems.org/gems/kitchen-ansiblepush)
 ![Ruby](https://github.com/ahelal/kitchen-ansiblepush/workflows/Ruby/badge.svg?branch=master)
@@ -6,6 +7,7 @@
 A test-kitchen plugin that adds the support for ansible in push mode i.e. normal mode :)
 
 ## Intro
+
 This kitchen plugin adds ansible as a provisioner in push mode. Ansible will run from your host rather than run from guest instance(s). That also means your code will not be copied to guest.
 
 It is designed to just simply work with minimum configuration. Just run as you would normaly do.
@@ -13,6 +15,7 @@ It is designed to just simply work with minimum configuration. Just run as you w
 ## How to install
 
 ### (1) Use Bundler
+
 My preferred method is use Gemfile
 
 ```ruby
@@ -25,11 +28,13 @@ end
 ```
 
 ### (2) Ruby gem
+
 ```bash
 gem install kitchen-ansiblepush
 ```
 
 ### (3) Install from code
+
 ```bash
 git clone git@github.com:ahelal/kitchen-ansiblepush.git
 cd kitchen-ansiblepush
@@ -38,6 +43,7 @@ gem install kitchen-ansiblepush-<version>.gem
 ```
 
 ## kitchen.yml Options
+
 ```yaml
 provisioner         :
     ## required options
@@ -68,14 +74,17 @@ provisioner         :
     generate_inv        : true
     use_instance_name   : false  # use short (platform) instead of instance name by default
     idempotency_test    : false
+    log_ansible_run     : false # log (info) ansible stdout/stderr so it appears in kitchen log
 
     ## When running on EC2 with Windows and using get-password pass the password as ansible_password variable
     pass_transport_password: false
     ## (optional), if you want to set specific environment variables when running ansible
     environment_vars:
-    	PROXMOX_URL: https://example.com:8006
+     PROXMOX_URL: https://example.com:8006
 ```
+
 ## Idempotency test
+
 If you want to check your code is idempotent you can use the idempotency_test. Essentially, this will run Ansible twice and check nothing changed in the second run. If something changed it will list the tasks. Note: If your using Ansible callback in your config this might conflict.
 
 ```yaml
@@ -133,7 +142,7 @@ provisioner:
 
 ### Windows AWS EC2 support
 
-When running EC2 instance without password set via _get_password_ password can be passed from transport to Ansible command line as varaible:
+When running EC2 instance without password set via *get_password* password can be passed from transport to Ansible command line as varaible:
 
 ```yaml
 provisioner:
@@ -175,11 +184,11 @@ test
 
 ## Real example usages
 
-- https://github.com/ahelal/ansible-concourse
-- https://github.com/hellofresh/ansible-deployment
-- https://github.com/AutomationWithAnsible/ansible-usermanage
-- https://github.com/danrue/ansible-variables
-- https://github.com/knakayama/kitchen-ansiblepush-demo
+* <https://github.com/ahelal/ansible-concourse>
+* <https://github.com/hellofresh/ansible-deployment>
+* <https://github.com/AutomationWithAnsible/ansible-usermanage>
+* <https://github.com/danrue/ansible-variables>
+* <https://github.com/knakayama/kitchen-ansiblepush-demo>
 
 ## TODO
 
