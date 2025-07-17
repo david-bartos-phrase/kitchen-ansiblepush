@@ -260,16 +260,14 @@ module Kitchen
           Open3.popen3(env, command) do |stdin, stdout, stderr, wait_thr|
             stdout.each_line do |line|
               clean_line = strip_ansi_colors(line)
-              f.write(clean_line)
+              f.write(clean_line) if conf[:log_ansible_run]
               print line
-              info(clean_line) if log_ansible_run
             end
 
             stderr.each_line do |line|
               clean_line = strip_ansi_colors(line)
-              f.write(clean_line)
+              f.write(clean_line) if conf[:log_ansible_run]
               print line
-              info(clean_line) if log_ansible_run
             end
 
             exit_code = wait_thr.value.exitstatus
