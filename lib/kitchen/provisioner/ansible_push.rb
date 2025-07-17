@@ -1,5 +1,6 @@
 require 'json'
 require 'open3'
+require 'fileutils'
 require 'kitchen'
 require 'kitchen/errors'
 require 'kitchen/provisioner/base'
@@ -57,6 +58,7 @@ module Kitchen
       default_config :module_path, nil
       default_config :pass_transport_password, false
       default_config :environment_vars, {}
+      default_config :log_ansible_run, false
 
       # For tests disable if not needed
       default_config :chef_bootstrap_url, 'https://omnitruck.chef.io/install.sh'
@@ -243,10 +245,41 @@ module Kitchen
 
       def exec_ansible_command(env, command, desc)
         debug("env=#{env} command=#{command}")
-        system(env, command.to_s)
-        exit_code = $CHILD_STATUS.exitstatus
-        debug("ansible-playbook exit code = #{exit_code}")
-        raise UserError, "#{desc} returned a non zero #{exit_code}. Please see the output above." if exit_code.to_i != 0
+
+        log_dir  = File.join(Dir.pwd, '.kitchen', 'logs')
+        FileUtils.mkdir_p(log_dir)
+
+        filename = "#{instance.name}-ansible-push.log"
+        log_file = File.join(log_dir, filename)
+
+        def strip_ansi_colors(str)
+          str.gsub(/\e\[[\d;]*m/, '')
+        end
+
+        File.open(log_file, 'w') do |f|
+          Open3.popen3(env, command) do |stdin, stdout, stderr, wait_thr|
+            stdout.each_line do |line|
+              clean_line = strip_ansi_colors(line)
+              f.write(clean_line) if conf[:log_ansible_run]
+              print line
+            end
+
+            stderr.each_line do |line|
+              clean_line = strip_ansi_colors(line)
+              f.write(clean_line) if conf[:log_ansible_run]
+              print line
+            end
+
+            exit_code = wait_thr.value.exitstatus
+            debug("ansible-playbook exit code = #{exit_code}")
+
+            if exit_code.to_i != 0
+              raise UserError,
+                "#{desc} returned a non-zero #{exit_code}. " \
+                "See #{log_file} for details."
+            end
+          end
+        end
       end
 
       def instance_connection_option
